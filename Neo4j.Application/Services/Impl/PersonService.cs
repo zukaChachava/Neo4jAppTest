@@ -1,3 +1,5 @@
+using Neo4j.Application.Dtos;
+using Neo4j.Application.Mappers;
 using Neo4j.Application.Repositories;
 using Neo4j.Domain.Entities;
 
@@ -12,8 +14,17 @@ public class PersonService : IPersonService
         _repositoryManager = repositoryManager;
     }
 
-    public Task<Person> AddPersonAsync(Person person)
+    public async Task<PersonDto> AddPersonAsync(PersonDto personDto)
     {
-        return _repositoryManager.PersonRepository.AddAsync(person);
+        PersonMapper personMapper = new PersonMapper();
+        var person = personMapper.PersonDtoToPerson(personDto);
+        return personMapper.PersonToPersonDto(await _repositoryManager.PersonRepository.AddAsync(person));
+    }
+
+    public async Task<IEnumerable<PersonDto>> GetAllPersonsAsync()
+    {
+        PersonMapper personMapper = new PersonMapper();
+        var persons = personMapper.PersonsToPersonsDto(await _repositoryManager.PersonRepository.GetAllAsync());
+        return persons;
     }
 }

@@ -1,3 +1,4 @@
+using Neo4j.Application.Dtos;
 using Neo4j.Application.Repositories;
 using Neo4jClient;
 using Neo4jClient.Cypher;
@@ -14,6 +15,8 @@ public abstract class BaseRepository<T> : IBaseRepository<T> where T : class, ne
     protected IBoltGraphClient Client { get; private set; }
 
     public abstract Task<T?> GetAsync(T entity);
+    public Task<IEnumerable<T>> GetAllAsync() =>
+        Client.Cypher.Match($"(e:{typeof(T).Name})").Return(e => e.As<T>()).ResultsAsync;
 
     protected abstract ICypherFluentQuery<T> GetEntity(T entity);
 

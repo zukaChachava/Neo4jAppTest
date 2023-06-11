@@ -10,4 +10,8 @@
       <ProjectReference Include="..\Neo4j.Domain\Neo4j.Domain.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="Riok.Mapperly" Version="2.8.0" />
+    </ItemGroup>
+
 </Project>
