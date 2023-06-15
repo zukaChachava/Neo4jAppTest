@@ -7,4 +7,5 @@ public interface IPersonService
 {
     Task<PersonDto> AddPersonAsync(PersonDto person);
     Task<IEnumerable<PersonDto>> GetAllPersonsAsync();
+    Task RegisterMarriageAsync(string firstPersonId, string secondPersonId, MarriedRelationDto marriedRelation);
 }

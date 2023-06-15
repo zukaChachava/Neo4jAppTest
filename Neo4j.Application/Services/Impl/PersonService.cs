@@ -2,6 +2,7 @@ using Neo4j.Application.Dtos;
 using Neo4j.Application.Mappers;
 using Neo4j.Application.Repositories;
 using Neo4j.Domain.Entities;
+using Neo4j.Domain.Relations;
 
 namespace Neo4j.Application.Services.Impl;
 
@@ -26,5 +27,14 @@ public class PersonService : IPersonService
         PersonMapper personMapper = new PersonMapper();
         var persons = personMapper.PersonsToPersonsDto(await _repositoryManager.PersonRepository.GetAllAsync());
         return persons;
+    }
+
+    public async Task RegisterMarriageAsync(string firstPersonId, string secondPersonId, MarriedRelationDto marriedRelation)
+    {
+        MarriedRelationMapper marriedRelationMapper = new MarriedRelationMapper();
+        await _repositoryManager.PersonRepository.AddWithRelationAsync<Married, Person>(
+            p1 => p1.Id == firstPersonId,
+            p2 => p2.Id == secondPersonId,
+            marriedRelationMapper.MarriedRelationDtoToMarried(marriedRelation));
     }
 }

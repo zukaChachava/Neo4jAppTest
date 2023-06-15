@@ -27,4 +27,16 @@ public class PersonsController : ControllerBase
     {
         return Ok(await _serviceManager.PersonService.GetAllPersonsAsync());
     }
+
+    [HttpPost("married-to")]
+    public async Task<IActionResult> RegisterMarriage(RegisterMarriageDto registerMarriage)
+    {
+        await _serviceManager
+            .PersonService
+            .RegisterMarriageAsync(
+                registerMarriage.FirstPersonId, 
+                registerMarriage.SecondPersonId, 
+                registerMarriage.MarriedRelation);
+        return Ok();
+    }
 }
