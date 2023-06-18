@@ -95,12 +95,14 @@ public abstract class BaseRepository<T> : IBaseRepository<T> where T : BaseEntit
     public virtual Task AddWithRelationAsync<TRelation, TOther>
         (Expression<Func<T, bool>> entity, Expression<Func<TOther, bool>> other, TRelation relation)
     {
+        string? firstNode = entity.Parameters[0].Name;
+        string? secondNode = other.Parameters[0].Name;
         return Client.Cypher
-            .Match($"(e:{typeof(T).Name})")
+            .Match($"({firstNode}:{typeof(T).Name})")
             .Where(entity)
-            .Match($"(o:{typeof(TOther).Name}")
+            .Match($"({secondNode}:{typeof(TOther).Name})")
             .Where(other)
-            .Create($"(e)-[rel:{typeof(TRelation).Name} $relation]->(o)")
+            .Create($"({firstNode})-[rel:{typeof(TRelation).Name} $relation]->({secondNode})")
             .WithParam("relation", relation)
             .ExecuteWithoutResultsAsync();
     }

@@ -13,6 +13,9 @@ public class PersonRepository : BaseRepository<Person>, IPersonRepository
 
     public override async Task<Person?> GetAsync(Person entity)
     {
+        Client.Cypher
+            .Match($"(p:{typeof(Person).Name})")
+            .Where((Person p) => p.Id == entity.Id);
         var result = await GetEntity(entity).ResultsAsync;
         return result.SingleOrDefault();
     }

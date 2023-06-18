@@ -19,6 +19,7 @@ public class PersonService : IPersonService
     {
         PersonMapper personMapper = new PersonMapper();
         var person = personMapper.PersonDtoToPerson(personDto);
+        person.Id = Guid.NewGuid().ToString();
         return personMapper.PersonToPersonDto(await _repositoryManager.PersonRepository.AddAsync(person));
     }
 
@@ -33,8 +34,8 @@ public class PersonService : IPersonService
     {
         MarriedRelationMapper marriedRelationMapper = new MarriedRelationMapper();
         await _repositoryManager.PersonRepository.AddWithRelationAsync<Married, Person>(
-            p1 => p1.Id == firstPersonId,
-            p2 => p2.Id == secondPersonId,
+            e => e.Id == firstPersonId,
+            o => o.Id == secondPersonId,
             marriedRelationMapper.MarriedRelationDtoToMarried(marriedRelation));
     }
 }
