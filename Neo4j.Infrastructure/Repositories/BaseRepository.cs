@@ -21,7 +21,7 @@ public abstract class BaseRepository<T> : IBaseRepository<T> where T : BaseEntit
     public Task<IEnumerable<T>> GetAllAsync() =>
         Client.Cypher.Match($"(e:{typeof(T).Name})").Return(e => e.As<T>()).ResultsAsync;
 
-    public async Task<IEnumerable<(T entity, TRelation relation)>?> GetAllWithRelationAsync<TRelation>() 
+    public async Task<IEnumerable<(T entity, TRelation relation)>?> GetAllWithRelationAsync<TRelation>()
         where TRelation : BaseRelation
     {
         var result = await Client.Cypher
@@ -32,11 +32,12 @@ public abstract class BaseRepository<T> : IBaseRepository<T> where T : BaseEntit
                     Entity = from.As<T>(),
                     Relation = rel.As<TRelation>()
                 }).ResultsAsync;
-        
+
         return result?.Select(r => (r.Entity, r.Relation));
     }
-    
-    public async Task<IEnumerable<(T entity, TRelation relation, TOther other)>?> GetAllWithRelationAsync<TRelation, TOther>() 
+
+    public async Task<IEnumerable<(T entity, TRelation relation, TOther other)>?> GetAllWithRelationAsync<TRelation,
+        TOther>()
         where TRelation : BaseRelation where TOther : class
     {
         var result = await Client.Cypher
@@ -48,11 +49,11 @@ public abstract class BaseRepository<T> : IBaseRepository<T> where T : BaseEntit
                     Relation = rel.As<TRelation>(),
                     Other = other.As<TOther>()
                 }).ResultsAsync;
-        
+
         return result?.Select(r => (r.Entity, r.Relation, r.Other));
     }
 
-    public async Task<IEnumerable<(T entity, TRelation relation)>?> GetAllWithReverseRelationAsync<TRelation>() 
+    public async Task<IEnumerable<(T entity, TRelation relation)>?> GetAllWithReverseRelationAsync<TRelation>()
         where TRelation : BaseRelation
     {
         var result = await Client.Cypher
@@ -63,11 +64,12 @@ public abstract class BaseRepository<T> : IBaseRepository<T> where T : BaseEntit
                     Entity = from.As<T>(),
                     Relation = rel.As<TRelation>()
                 }).ResultsAsync;
-        
+
         return result?.Select(r => (r.Entity, r.Relation));
     }
-    
-    public async Task<IEnumerable<(T entity, TRelation relation, TOther other)>?> GetAllWithReverseRelationAsync<TRelation, TOther>() 
+
+    public async Task<IEnumerable<(T entity, TRelation relation, TOther other)>?> GetAllWithReverseRelationAsync<
+        TRelation, TOther>()
         where TRelation : BaseRelation where TOther : class
     {
         var result = await Client.Cypher
@@ -92,8 +94,9 @@ public abstract class BaseRepository<T> : IBaseRepository<T> where T : BaseEntit
         return entity;
     }
 
-    public virtual Task AddWithRelationAsync<TRelation, TOther>
+    public virtual Task AddRelationAsync<TRelation, TOther>
         (Expression<Func<T, bool>> entity, Expression<Func<TOther, bool>> other, TRelation relation)
+        where TOther : class where TRelation : class
     {
         string? firstNode = entity.Parameters[0].Name;
         string? secondNode = other.Parameters[0].Name;
@@ -104,6 +107,16 @@ public abstract class BaseRepository<T> : IBaseRepository<T> where T : BaseEntit
             .Where(other)
             .Create($"({firstNode})-[rel:{typeof(TRelation).Name} $relation]->({secondNode})")
             .WithParam("relation", relation)
+            .ExecuteWithoutResultsAsync();
+    }
+
+    public virtual Task AddWithRelationAsync<TRelation, TOther>
+        (T entity, TOther other, TRelation relation) where TOther : class where TRelation : class
+    {
+        return Client.Cypher
+            .Create($"(e:{typeof(T).Name} $entity)").WithParam("entity", entity)
+            .Create($"(o:{typeof(TOther).Name}) $other").WithParam("other", other)
+            .Create($"(e)-[rel:{typeof(TRelation).Name} $relation]->(o)").WithParam("relation", relation)
             .ExecuteWithoutResultsAsync();
     }
 

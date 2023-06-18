@@ -22,8 +22,13 @@ public interface IBaseRepository<T> where T: class
     Task<IEnumerable<T>> GetAllAsync();
     Task<T> AddAsync(T entity);
 
+    Task AddRelationAsync<TRelation, TOther>
+        (Expression<Func<T, bool>> entity, Expression<Func<TOther, bool>> other, TRelation relation)
+        where TOther : class where TRelation : class;
+
     Task AddWithRelationAsync<TRelation, TOther>
-        (Expression<Func<T, bool>> entity, Expression<Func<TOther, bool>> other, TRelation relation);
+        (T entity, TOther other, TRelation relation)
+        where TOther : class where TRelation : class;
     
     Task<T> UpdateAsync(T entity);
     Task DeleteAsync(T entity);

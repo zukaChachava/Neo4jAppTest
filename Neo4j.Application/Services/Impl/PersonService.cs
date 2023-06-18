@@ -33,7 +33,7 @@ public class PersonService : IPersonService
     public async Task RegisterMarriageAsync(string firstPersonId, string secondPersonId, MarriedRelationDto marriedRelation)
     {
         MarriedRelationMapper marriedRelationMapper = new MarriedRelationMapper();
-        await _repositoryManager.PersonRepository.AddWithRelationAsync<Married, Person>(
+        await _repositoryManager.PersonRepository.AddRelationAsync<Married, Person>(
             e => e.Id == firstPersonId,
             o => o.Id == secondPersonId,
             marriedRelationMapper.MarriedRelationDtoToMarried(marriedRelation));
